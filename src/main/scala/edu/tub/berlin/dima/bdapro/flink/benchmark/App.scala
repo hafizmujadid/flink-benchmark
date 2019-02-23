@@ -12,7 +12,7 @@ object App {
     env.enableCheckpointing(JobConfig.CHECKPOINT_INTERVAL)
     env.setParallelism(22)
 
-    val rocksDBStateBackend: RocksDBStateBackend = new RocksDBStateBackend(JobConfig.CHECKPOINT_DIR, false)
+    val rocksDBStateBackend: RocksDBStateBackend = new RocksDBStateBackend(JobConfig.CHECKPOINT_DIR, true)
     //rocksDBStateBackend.setOptions(new RocksDbStateBackendOptions)
     env.setStateBackend(rocksDBStateBackend)
     //env.setStateBackend(new FsStateBackend(JobConfig.CHECKPOINT_DIR))
