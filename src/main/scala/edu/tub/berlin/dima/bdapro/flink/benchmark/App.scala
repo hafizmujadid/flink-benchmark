@@ -9,14 +9,13 @@ object App {
 
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
-    //env.enableCheckpointing(JobConfig.CHECKPOINT_INTERVAL)
-    //env.getConfig.setLatencyTrackingInterval(JobConfig.CHECKPOINT_INTERVAL)
+    env.enableCheckpointing(JobConfig.CHECKPOINT_INTERVAL)
     env.setParallelism(22)
 
     //val rocksDBStateBackend: RocksDBStateBackend = new RocksDBStateBackend(JobConfig.CHECKPOINT_DIR, true)
     //rocksDBStateBackend.setOptions(new RocksDbStateBackendOptions)
     //env.setStateBackend(rocksDBStateBackend)
-    //env.setStateBackend(new FsStateBackend(JobConfig.CHECKPOINT_DIR))
+    env.setStateBackend(new FsStateBackend(JobConfig.CHECKPOINT_DIR))
 
     val query = new TopSellersByCity
     query.run(env)
