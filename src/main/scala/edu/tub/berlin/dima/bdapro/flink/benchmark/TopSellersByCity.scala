@@ -112,7 +112,7 @@ class TopSellersByCity {
       override def map(value: (String, Int, Long, Long)): (String, Int, Long, Long) = {
         processTimeLatency = System.currentTimeMillis() - value._4
         eventTimeLatency = System.currentTimeMillis() - value._3
-        this.meter.markEvent()
+        this.meter.markEvent(value._2)
         value
       }
     }).addSink(x=>println(x._1,x._2))
