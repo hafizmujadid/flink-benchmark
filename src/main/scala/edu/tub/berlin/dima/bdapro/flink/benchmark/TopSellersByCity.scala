@@ -14,7 +14,7 @@ import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema
 import org.apache.flink.util.Collector
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 
 class TopSellersByCity {
   def run(env:StreamExecutionEnvironment): Unit ={
@@ -94,7 +94,7 @@ class TopSellersByCity {
       @transient private var processTimeLatency: Long = 0
       @transient private var eventTimeLatency: Long = 0
       @transient private var meter:Meter = _
-      val logger = LoggerFactory.getLogger("throughput")
+      val logger: Logger = LoggerFactory.getLogger("throughput")
       private var totalReceived = 0
       private var lastTotalReceived:Long = 0
       private var lastLogTimeMs:Long = -1
@@ -145,8 +145,10 @@ class TopSellersByCity {
             val temp =elementDiff * ex
             val str=  "During the last "+timeDiff+" ms, we received "+elementDiff+" elements. That's "+temp+" elements/second/core."
             logger.info(str)
+            println(str)
             val output ="During the last"+timeDiff+" ms, Event Time latency is "+avrgEL+" ms , Process Time Latency is "+avrgPL+" ms."
             logger.info(output)
+            println(output)
             lastLogTimeMs = now
             lastTotalReceived = totalReceived
           }
