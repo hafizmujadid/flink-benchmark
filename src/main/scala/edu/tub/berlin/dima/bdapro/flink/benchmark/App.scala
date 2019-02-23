@@ -1,8 +1,9 @@
 package edu.tub.berlin.dima.bdapro.flink.benchmark
-import org.apache.flink.contrib.streaming.state.RocksDBStateBackend
+import org.apache.flink.contrib.streaming.state.{OptionsFactory, RocksDBStateBackend}
 import org.apache.flink.runtime.state.filesystem.FsStateBackend
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
+import org.rocksdb.{BlockBasedTableConfig, ColumnFamilyOptions, DBOptions}
 object App {
   def main(args: Array[String]): Unit = {
     JobConfig.CHECKPOINT_DIR="hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/checkpointing"
@@ -13,7 +14,7 @@ object App {
     env.setParallelism(22)
 
     val rocksDBStateBackend: RocksDBStateBackend = new RocksDBStateBackend(JobConfig.CHECKPOINT_DIR, false)
-    //rocksDBStateBackend.setOptions(new RocksDbStateBackendOptions)
+    rocksDBStateBackend.setOptions(new RocksDbStateBackendOptions)
     env.setStateBackend(rocksDBStateBackend)
     //env.setStateBackend(new FsStateBackend(JobConfig.CHECKPOINT_DIR))
 
@@ -21,9 +22,9 @@ object App {
     query.run(env)
   }
 
-  /*class RocksDbStateBackendOptions extends OptionsFactory {
+  class RocksDbStateBackendOptions extends OptionsFactory {
     override def createDBOptions(currentOptions: DBOptions): DBOptions = {
-      currentOptions.setIncreaseParallelism(4).setUseFsync(false)
+      currentOptions.setIncreaseParallelism(22).setUseFsync(false)
     }
 
     override def createColumnOptions(currentOptions: ColumnFamilyOptions): ColumnFamilyOptions = {
@@ -32,5 +33,5 @@ object App {
           .setBlockCacheSize(256 * 1024 * 1024)  // 256 MB
           .setBlockSize(128 * 1024))  //128 MB
     }
-  }*/
+  }
 }
