@@ -124,11 +124,11 @@ class TopSellersByCity {
         this.meter.markEvent()
 
         totalReceived +=1
-        if (totalReceived % logfreq eq 0) {
+        if (totalReceived % logfreq == 0) {
 
           val now = System.currentTimeMillis
           // throughput for the last "logfreq" elements
-          if (lastLogTimeMs eq -1) {
+          if (lastLogTimeMs == -1) {
             lastLogTimeMs = now
             lastTotalReceived = totalReceived
             eventLatencySum =eventLatencySum
@@ -142,8 +142,9 @@ class TopSellersByCity {
             val avrgEL = eventLatencySum /elementDiff
             processLatencySum = 0
             eventLatencySum = 0
-
-            logger.info("During the last {} ms, we received {} elements. That's {} elements/second/core.", timeDiff, elementDiff, elementDiff * ex)
+            val temp =elementDiff * ex
+            val str=  "During the last "+timeDiff+" ms, we received "+elementDiff+" elements. That's "+temp+" elements/second/core."
+            logger.info(str)
             val output ="During the last"+timeDiff+" ms, Event Time latency is "+avrgEL+" ms , Process Time Latency is "+avrgPL+" ms."
             logger.info(output)
             lastLogTimeMs = now
