@@ -14,6 +14,7 @@ import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema
 import org.apache.flink.util.Collector
+import org.slf4j.LoggerFactory
 
 class TopSellersByCity {
   def run(env:StreamExecutionEnvironment): Unit ={
@@ -51,7 +52,7 @@ class TopSellersByCity {
         meter.markEvent()
         Bid(tokens(0).toLong,tokens(1).toDouble,tokens(2).toLong,tokens(3).toLong,System.currentTimeMillis())
       }
-    }).assignAscendingTimestamps(_.processingTime).name("bid_source").uid("bid_source")
+    })/*.assignAscendingTimestamps(_.processingTime)*/.name("bid_source").uid("bid_source")
 
     //Person object
 
@@ -69,7 +70,7 @@ class TopSellersByCity {
         Person(tokens(0).toLong, tokens(1), tokens(2),
           tokens(3), tokens(4), tokens(5), tokens(6).toLong,System.currentTimeMillis())
       }
-    }).assignAscendingTimestamps(_.processTime).name("person_stream").uid("person_stream")
+    })/*.assignAscendingTimestamps(_.processTime)*/.name("person_stream").uid("person_stream")
 
     val result: DataStream[(String, Int, Long, Long)] =bids.join(persons)
       .where(b=>b.bidderId)
@@ -93,13 +94,19 @@ class TopSellersByCity {
       @transient private var processTimeLatency: Long = 0
       @transient private var eventTimeLatency: Long = 0
       @transient private var meter:Meter = _
-
+      val logger = LoggerFactory.getLogger("throughput")
+      private var totalReceived = 0
+      private var lastTotalReceived:Long = 0
+      private var lastLogTimeMs:Long = -1
+      private val logfreq = 1000L
+      private var processLatencySum:Double=0f
+      private var eventLatencySum:Double=0f
 
       override def open(parameters: Configuration): Unit = {
         super.open(parameters)
         val dropWizardMeter: com.codahale.metrics.Meter = new com.codahale.metrics.Meter()
         meter = getRuntimeContext
-          .getMetricGroup.meter("Throughput", new DropwizardMeterWrapper(dropWizardMeter))
+          .getMetricGroup.meter("throughput", new DropwizardMeterWrapper(dropWizardMeter))
 
         getRuntimeContext
           .getMetricGroup
@@ -112,10 +119,41 @@ class TopSellersByCity {
       override def map(value: (String, Int, Long, Long)): (String, Int, Long, Long) = {
         processTimeLatency = System.currentTimeMillis() - value._4
         eventTimeLatency = System.currentTimeMillis() - value._3
+        processLatencySum+=processTimeLatency
+        eventLatencySum+= eventLatencySum
         this.meter.markEvent()
+
+        totalReceived +=1
+        if (totalReceived % logfreq eq 0) {
+
+          val now = System.currentTimeMillis
+          // throughput for the last "logfreq" elements
+          if (lastLogTimeMs eq -1) {
+            lastLogTimeMs = now
+            lastTotalReceived = totalReceived
+            eventLatencySum =eventLatencySum
+            processLatencySum = processLatencySum
+          } else {
+
+            val timeDiff = now - lastLogTimeMs
+            val elementDiff = totalReceived - lastTotalReceived
+            val ex = 1000 / timeDiff.toDouble
+            val avrgPL = processLatencySum /elementDiff
+            val avrgEL = eventLatencySum /elementDiff
+            processLatencySum = 0
+            eventLatencySum = 0
+
+            logger.info("During the last {} ms, we received {} elements. That's {} elements/second/core.", timeDiff, elementDiff, elementDiff * ex)
+            val output ="During the last"+timeDiff+" ms, Event Time latency is "+avrgEL+" ms , Process Time Latency is "+avrgPL+" ms."
+            logger.info(output)
+            lastLogTimeMs = now
+            lastTotalReceived = totalReceived
+          }
+        }
         value
       }
-    }).addSink(x=>println(x._1,x._2))
+    }).name("metrics-mapper").uid("metrics-mapper")
+      .addSink(x=>println(x._1,x._2)).name("console-sink").uid("console-sink")
 
     env.execute()
 
