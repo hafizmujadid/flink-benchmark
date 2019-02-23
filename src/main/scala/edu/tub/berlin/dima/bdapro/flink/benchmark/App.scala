@@ -12,10 +12,10 @@ object App {
     env.enableCheckpointing(JobConfig.CHECKPOINT_INTERVAL)
     env.setParallelism(22)
 
-    //val rocksDBStateBackend: RocksDBStateBackend = new RocksDBStateBackend(JobConfig.CHECKPOINT_DIR, true)
+    val rocksDBStateBackend: RocksDBStateBackend = new RocksDBStateBackend(JobConfig.CHECKPOINT_DIR, false)
     //rocksDBStateBackend.setOptions(new RocksDbStateBackendOptions)
-    //env.setStateBackend(rocksDBStateBackend)
-    env.setStateBackend(new FsStateBackend(JobConfig.CHECKPOINT_DIR))
+    env.setStateBackend(rocksDBStateBackend)
+    //env.setStateBackend(new FsStateBackend(JobConfig.CHECKPOINT_DIR))
 
     val query = new TopSellersByCity
     query.run(env)
