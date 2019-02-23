@@ -11,7 +11,7 @@ object App {
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
     //env.enableCheckpointing(JobConfig.CHECKPOINT_INTERVAL)
     //env.getConfig.setLatencyTrackingInterval(JobConfig.CHECKPOINT_INTERVAL)
-    env.setParallelism(20)
+    env.setParallelism(10)
 
     //val rocksDBStateBackend: RocksDBStateBackend = new RocksDBStateBackend(JobConfig.CHECKPOINT_DIR, true)
     //rocksDBStateBackend.setOptions(new RocksDbStateBackendOptions)
