@@ -9,7 +9,7 @@ import org.apache.flink.configuration.Configuration
 import org.apache.flink.dropwizard.metrics.DropwizardMeterWrapper
 import org.apache.flink.metrics.Meter
 import org.apache.flink.streaming.api.scala._
-import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
+import org.apache.flink.streaming.api.windowing.assigners.{SlidingEventTimeWindows, TumblingEventTimeWindows}
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema
@@ -73,8 +73,8 @@ class MonitorNewUsers {
     val result: DataStream[(Long, String, Long, Long, Long)] = persons.join(auctions)
       .where(p => p.personId)
       .equalTo(auction => auction.sellerId)
-      .window(TumblingEventTimeWindows.of(Time.minutes(10)))
-      //.window(SlidingEventTimeWindows.of(Time.seconds(60),Time.seconds(10)))
+      //.window(TumblingEventTimeWindows.of(Time.minutes(10)))
+      .window(SlidingEventTimeWindows.of(Time.seconds(60),Time.seconds(10)))
       .apply { (person, auction) => {
       val processTime = if (person.processTime > auction.processTime) person.processTime else auction.processTime
       val eventTime = if (person.eventTime > auction.eventTime) person.eventTime else auction.eventTime

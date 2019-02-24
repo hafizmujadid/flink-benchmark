@@ -17,7 +17,7 @@ object App {
     env.setStateBackend(rocksDBStateBackend)
     //env.setStateBackend(new FsStateBackend(JobConfig.CHECKPOINT_DIR))
 
-    val query = new TopSellersByCity
+    val query = new MonitorNewUsers
     query.run(env)
   }
 

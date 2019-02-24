@@ -84,7 +84,7 @@ class TopSellersByCity {
       })
       .keyBy(_._2)
       //.window(TumblingEventTimeWindows.of(Time.minutes(1)))
-      .window(SlidingEventTimeWindows.of(Time.seconds(60),Time.seconds(10)))
+      .window(SlidingEventTimeWindows.of(Time.seconds(60),Time.seconds(20)))
       .apply( (key, _, in, out: Collector[(String, Int, Long, Long)]) => {
         val countByCity: Int = in.iterator.length
         val processingTime = in.iterator.minBy(x=>x._4)._4
