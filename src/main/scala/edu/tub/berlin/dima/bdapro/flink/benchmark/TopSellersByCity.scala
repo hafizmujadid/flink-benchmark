@@ -9,7 +9,7 @@ import org.apache.flink.configuration.Configuration
 import org.apache.flink.dropwizard.metrics.DropwizardMeterWrapper
 import org.apache.flink.metrics.Meter
 import org.apache.flink.streaming.api.scala._
-import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
+import org.apache.flink.streaming.api.windowing.assigners.{SlidingEventTimeWindows, TumblingEventTimeWindows}
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema
@@ -75,14 +75,16 @@ class TopSellersByCity {
     val result: DataStream[(String, Int, Long, Long)] =bids.join(persons)
       .where(b=>b.bidderId)
       .equalTo(p=>p.personId)
-      .window(TumblingEventTimeWindows.of(Time.minutes(1)))
+      //.window(TumblingEventTimeWindows.of(Time.minutes(1)))
+      .window(SlidingEventTimeWindows.of(Time.seconds(60),Time.seconds(20)))
       .apply((bid,person) =>{
         val processingTime= if(person.processTime>bid.processingTime) person.processTime else bid.processingTime
         val eventTime = if(person.eventTime>bid.eventTime) person.eventTime else bid.eventTime
         (bid.bidderId,person.city,eventTime,processingTime,bid.price,1)
       })
       .keyBy(_._2)
-      .window(TumblingEventTimeWindows.of(Time.minutes(1)))
+      //.window(TumblingEventTimeWindows.of(Time.minutes(1)))
+      .window(SlidingEventTimeWindows.of(Time.seconds(60),Time.seconds(10)))
       .apply( (key, _, in, out: Collector[(String, Int, Long, Long)]) => {
         val countByCity: Int = in.iterator.length
         val processingTime = in.iterator.minBy(x=>x._4)._4
