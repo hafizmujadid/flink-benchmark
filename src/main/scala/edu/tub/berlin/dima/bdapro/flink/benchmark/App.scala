@@ -13,7 +13,7 @@ object App {
     env.setParallelism(22)
 
     val rocksDBStateBackend: RocksDBStateBackend = new RocksDBStateBackend(JobConfig.CHECKPOINT_DIR,
-      true)
+      false)
     //rocksDBStateBackend.setPredefinedOptions(PredefinedOptions.SPINNING_DISK_OPTIMIZED)
     //rocksDBStateBackend.setOptions(new RocksDbStateBackendOptions)
     env.setStateBackend(rocksDBStateBackend)
