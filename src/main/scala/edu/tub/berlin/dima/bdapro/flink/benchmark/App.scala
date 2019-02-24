@@ -1,4 +1,8 @@
 package edu.tub.berlin.dima.bdapro.flink.benchmark
+import java.util.concurrent.TimeUnit
+
+import org.apache.flink.api.common.restartstrategy.RestartStrategies
+import org.apache.flink.api.common.time.Time
 import org.apache.flink.contrib.streaming.state.{PredefinedOptions, RocksDBStateBackend}
 import org.apache.flink.runtime.state.filesystem.FsStateBackend
 import org.apache.flink.streaming.api.TimeCharacteristic
@@ -11,7 +15,7 @@ object App {
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
     env.enableCheckpointing(JobConfig.CHECKPOINT_INTERVAL)
     env.setParallelism(22)
-
+    env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3, Time.of(60, TimeUnit.SECONDS) ))
     //val rocksDBStateBackend: RocksDBStateBackend = new RocksDBStateBackend(JobConfig.CHECKPOINT_DIR, false)
     //rocksDBStateBackend.setPredefinedOptions(PredefinedOptions.SPINNING_DISK_OPTIMIZED)
     //rocksDBStateBackend.setOptions(new RocksDbStateBackendOptions)
