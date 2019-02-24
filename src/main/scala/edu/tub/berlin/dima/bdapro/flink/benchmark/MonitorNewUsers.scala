@@ -74,7 +74,7 @@ class MonitorNewUsers {
       .where(p => p.personId)
       .equalTo(auction => auction.sellerId)
       //.window(TumblingEventTimeWindows.of(Time.minutes(10)))
-      .window(SlidingEventTimeWindows.of(Time.seconds(60),Time.seconds(10)))
+      .window(SlidingEventTimeWindows.of(Time.minutes(12),Time.minutes(9)))
       .apply { (person, auction) => {
       val processTime = if (person.processTime > auction.processTime) person.processTime else auction.processTime
       val eventTime = if (person.eventTime > auction.eventTime) person.eventTime else auction.eventTime
