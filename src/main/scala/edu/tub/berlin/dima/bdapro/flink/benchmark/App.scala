@@ -1,5 +1,6 @@
 package edu.tub.berlin.dima.bdapro.flink.benchmark
 import org.apache.flink.contrib.streaming.state.{PredefinedOptions, RocksDBStateBackend}
+import org.apache.flink.runtime.state.filesystem.FsStateBackend
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 object App {
@@ -11,11 +12,11 @@ object App {
     env.enableCheckpointing(JobConfig.CHECKPOINT_INTERVAL)
     env.setParallelism(22)
 
-    val rocksDBStateBackend: RocksDBStateBackend = new RocksDBStateBackend(JobConfig.CHECKPOINT_DIR, false)
+    //val rocksDBStateBackend: RocksDBStateBackend = new RocksDBStateBackend(JobConfig.CHECKPOINT_DIR, false)
     //rocksDBStateBackend.setPredefinedOptions(PredefinedOptions.SPINNING_DISK_OPTIMIZED)
     //rocksDBStateBackend.setOptions(new RocksDbStateBackendOptions)
-    env.setStateBackend(rocksDBStateBackend)
-    //env.setStateBackend(new FsStateBackend(JobConfig.CHECKPOINT_DIR))
+    //env.setStateBackend(rocksDBStateBackend)
+    env.setStateBackend(new FsStateBackend(JobConfig.CHECKPOINT_DIR))
 
     val query = new MonitorNewUsers
     query.run(env)
