@@ -17,7 +17,7 @@ object App {
     env.setParallelism(22)
     env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3, Time.of(60, TimeUnit.SECONDS) ))
     val rocksDBStateBackend: RocksDBStateBackend = new RocksDBStateBackend(JobConfig.CHECKPOINT_DIR,
-      true)
+      false)
     //rocksDBStateBackend.setPredefinedOptions(PredefinedOptions.SPINNING_DISK_OPTIMIZED_HIGH_MEM)
     //rocksDBStateBackend.setOptions(new RocksDbStateBackendOptions)
     env.setStateBackend(rocksDBStateBackend)
