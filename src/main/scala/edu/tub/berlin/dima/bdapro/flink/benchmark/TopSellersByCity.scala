@@ -124,10 +124,8 @@ class TopSellersByCity {
         processLatencySum+=processTimeLatency
         eventLatencySum+= eventLatencySum
         this.meter.markEvent()
-
         totalReceived +=1
         if (totalReceived % logfreq == 0) {
-
           val now = System.currentTimeMillis
           // throughput for the last "logfreq" elements
           if (lastLogTimeMs == -1) {

@@ -16,9 +16,9 @@ object App {
     env.enableCheckpointing(JobConfig.CHECKPOINT_INTERVAL)
     env.setParallelism(22)
     env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3, Time.of(60, TimeUnit.SECONDS) ))
-    //val rocksDBStateBackend: RocksDBStateBackend = new RocksDBStateBackend(JobConfig.CHECKPOINT_DIR,
-      //false)
-    //rocksDBStateBackend.setPredefinedOptions(PredefinedOptions.SPINNING_DISK_OPTIMIZED_HIGH_MEM)
+    val rocksDBStateBackend: RocksDBStateBackend = new RocksDBStateBackend(JobConfig.CHECKPOINT_DIR,
+      true)
+    rocksDBStateBackend.setPredefinedOptions(PredefinedOptions.SPINNING_DISK_OPTIMIZED_HIGH_MEM)
     //rocksDBStateBackend.setOptions(new RocksDbStateBackendOptions)
     //env.setStateBackend(rocksDBStateBackend)
     env.setStateBackend(new FsStateBackend(JobConfig.CHECKPOINT_DIR))
