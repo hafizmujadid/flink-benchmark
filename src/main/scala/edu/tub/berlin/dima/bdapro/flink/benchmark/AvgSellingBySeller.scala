@@ -40,7 +40,7 @@ class AvgSellingBySeller {
     }).assignAscendingTimestamps(_.processTime).name("auction_source").uid("auction_source")
 
     val result: DataStream[(Auction, Double)] = auctions.keyBy(_.sellerId)
-      .window(TumblingEventTimeWindows.of(Time.minutes(60)))
+      .window(TumblingEventTimeWindows.of(Time.minutes(30)))
       //.window(SlidingEventTimeWindows.of(Time.minutes(1),Time.milliseconds(30*1000)))
       .aggregate(new AggregateFunction[Auction, (Double, Long, Auction), (Auction, Double)] {
       override def createAccumulator(): (Double, Long, Auction) = (0.toDouble, 0L, null)
