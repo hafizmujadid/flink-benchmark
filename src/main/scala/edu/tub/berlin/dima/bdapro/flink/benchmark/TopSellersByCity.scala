@@ -52,7 +52,7 @@ class TopSellersByCity {
         meter.markEvent()
         Bid(tokens(0).toLong,tokens(1).toDouble,tokens(2).toLong,tokens(3).toLong,System.currentTimeMillis())
       }
-    })/*.assignAscendingTimestamps(_.processingTime)*/.name("bid_source").uid("bid_source")
+    }).assignAscendingTimestamps(_.eventTime).name("bid_source").uid("bid_source")
 
     //Person object
 

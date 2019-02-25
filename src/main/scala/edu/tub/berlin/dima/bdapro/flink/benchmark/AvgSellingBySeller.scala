@@ -40,7 +40,7 @@ class AvgSellingBySeller {
     }).assignAscendingTimestamps(_.processTime).name("auction_source").uid("auction_source")
 
     val result: DataStream[(Auction, Double)] = auctions.keyBy(_.sellerId)
-      .window(TumblingEventTimeWindows.of(Time.minutes(2)))
+      .window(TumblingEventTimeWindows.of(Time.minutes(60)))
       //.window(SlidingEventTimeWindows.of(Time.minutes(1),Time.milliseconds(30*1000)))
       .aggregate(new AggregateFunction[Auction, (Double, Long, Auction), (Auction, Double)] {
       override def createAccumulator(): (Double, Long, Auction) = (0.toDouble, 0L, null)
@@ -57,7 +57,7 @@ class AvgSellingBySeller {
       }
     })
 
-    result.map(new RichMapFunction[(Auction, Double), (Auction, Double)] {
+    /*result.map(new RichMapFunction[(Auction, Double), (Auction, Double)] {
 
       @transient private var meter: Meter = _
       @transient private var processTimeLatency: Long = 0L
@@ -82,7 +82,12 @@ class AvgSellingBySeller {
         meter.markEvent()
         value
       }
-    }).addSink(x=> println(x._2))
+    }).addSink(x=> println(x._2))*/
+
+    result.map(x =>{
+      val currentTime= System.currentTimeMillis()
+      (currentTime,x._1.eventTime,currentTime,x._1.eventTime)
+    }).writeAsText("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/output").setParallelism(1)
     env.execute("q6")
   }
 }
