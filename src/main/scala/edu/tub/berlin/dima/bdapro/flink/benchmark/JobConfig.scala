@@ -7,5 +7,4 @@ object JobConfig {
   var BOOTSTRAP_SERVER="ibm-power-6.dima.tu-berlin.de:9092"
   var CHECKPOINT_INTERVAL=10*60*1000
   var CHECKPOINT_DIR="file:///home/ubuntu/checkpoints"
-  var WINDOW_INTERVAL =12
 }
