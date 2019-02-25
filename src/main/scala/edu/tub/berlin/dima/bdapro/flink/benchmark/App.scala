@@ -18,24 +18,10 @@ object App {
     val rocksDBStateBackend: RocksDBStateBackend = new RocksDBStateBackend(JobConfig.CHECKPOINT_DIR,
       true)
     rocksDBStateBackend.setPredefinedOptions(PredefinedOptions.SPINNING_DISK_OPTIMIZED_HIGH_MEM)
-    //rocksDBStateBackend.setOptions(new RocksDbStateBackendOptions)
-    //env.setStateBackend(rocksDBStateBackend)
-    env.setStateBackend(new FsStateBackend(JobConfig.CHECKPOINT_DIR))
+    env.setStateBackend(rocksDBStateBackend)
+    //env.setStateBackend(new FsStateBackend(JobConfig.CHECKPOINT_DIR))
 
     val query = new AvgSellingBySeller
     query.run(env)
   }
-
-  /*class RocksDbStateBackendOptions extends OptionsFactory {
-    override def createDBOptions(currentOptions: DBOptions): DBOptions = {
-      currentOptions.setIncreaseParallelism(4).setUseFsync(false)
-    }
-
-    override def createColumnOptions(currentOptions: ColumnFamilyOptions): ColumnFamilyOptions = {
-      currentOptions.setTableFormatConfig(
-        new BlockBasedTableConfig()
-          .setBlockCacheSize(256 * 1024 * 1024)  // 256 MB
-          .setBlockSize(128 * 1024))  //128 MB
-    }
-  }*/
 }
