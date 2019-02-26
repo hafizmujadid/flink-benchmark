@@ -7,7 +7,9 @@ import org.apache.flink.api.scala.metrics.ScalaGauge
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.dropwizard.metrics.DropwizardMeterWrapper
 import org.apache.flink.metrics.Meter
+import org.apache.flink.streaming.api.functions.{AscendingTimestampExtractor, AssignerWithPunctuatedWatermarks}
 import org.apache.flink.streaming.api.scala._
+import org.apache.flink.streaming.api.watermark.Watermark
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
@@ -23,17 +25,14 @@ class AvgSellingBySeller {
       .addSource(new
           FlinkKafkaConsumer011[String](JobConfig.AUCTION_TOPIC, new SimpleStringSchema(), properties)
         .setStartFromEarliest())
-      .setParallelism(2)
-      .map(new RichMapFunction[String, Auction] {
-
-      override def map(value: String): Auction = {
+      .setParallelism(2).name("auction_source").uid("auction_source")
+      .map(value=>{
         val tokens = value.split(",")
         Auction(tokens(0).toLong, tokens(1).toLong, tokens(2).toLong, tokens(3).toLong,
           tokens(4).toDouble, tokens(5).toLong, tokens(6).toLong, System.currentTimeMillis())
-      }
-    })
-      .assignAscendingTimestamps(_.processTime)
-      .name("auction_source").uid("auction_source").setParallelism(22)
+      }).assignTimestampsAndWatermarks(new AscendingTimestampExtractor[Auction] {
+        override def extractAscendingTimestamp(t: Auction): Long = t.eventTime
+      }).name("map_auction").uid("map_auction").setParallelism(22)
 
     val result: DataStream[(Auction, Double)] = auctions.keyBy(_.sellerId)
       .window(TumblingEventTimeWindows.of(Time.minutes(30)))
@@ -50,7 +49,7 @@ class AvgSellingBySeller {
       override def merge(a: (Double, Long, Auction), b: (Double, Long, Auction)): (Double, Long, Auction) = {
         (a._1 + b._1, a._2 + b._2, a._3)
       }
-    }).setParallelism(22)
+    }).name("avg").uid("avg").setParallelism(22)
     /*result.map(new RichMapFunction[(Auction, Double), (Auction, Double)] {
 
       @transient private var meter: Meter = _
