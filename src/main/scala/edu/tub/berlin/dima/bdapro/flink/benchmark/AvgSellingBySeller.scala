@@ -81,7 +81,7 @@ class AvgSellingBySeller {
     result.map(x =>{
       val currentTime= System.currentTimeMillis()
       (currentTime,x._1.eventTime,currentTime,x._1.eventTime)
-    }).setParallelism(22).addSink(x=>println(x))//.writeAsText("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/output").setParallelism(1)
+    }).name("metrics").uid("metrics").setParallelism(22).addSink(x=>println(x))//.writeAsText("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/output").setParallelism(1)
     env.execute("q6")
   }
 }
