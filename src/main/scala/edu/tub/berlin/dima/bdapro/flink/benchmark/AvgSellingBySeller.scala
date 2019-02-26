@@ -19,21 +19,24 @@ class AvgSellingBySeller {
     // only required for Kafka 0.8
     properties.setProperty("group.id", "test")
 
-    /*val auctions = env
+    val auctions = env
       .addSource(new
           FlinkKafkaConsumer011[String](JobConfig.AUCTION_TOPIC, new SimpleStringSchema(), properties)
-        .setStartFromEarliest()).map(new RichMapFunction[String, Auction] {
+        .setStartFromEarliest())
+      .setParallelism(2)
+      .map(new RichMapFunction[String, Auction] {
 
       override def map(value: String): Auction = {
         val tokens = value.split(",")
         Auction(tokens(0).toLong, tokens(1).toLong, tokens(2).toLong, tokens(3).toLong,
           tokens(4).toDouble, tokens(5).toLong, tokens(6).toLong, System.currentTimeMillis())
       }
-    }).assignAscendingTimestamps(_.processTime).name("auction_source").uid("auction_source")*/
+    })
+      .assignAscendingTimestamps(_.processTime)
+      .name("auction_source").uid("auction_source").setParallelism(22)
 
-    val auctions = env.addSource(new AuctionSource).assignAscendingTimestamps(_.processTime).name("auction_source").uid("auction_source")
     val result: DataStream[(Auction, Double)] = auctions.keyBy(_.sellerId)
-      .window(TumblingEventTimeWindows.of(Time.minutes(3)))
+      .window(TumblingEventTimeWindows.of(Time.minutes(30)))
       //.window(SlidingEventTimeWindows.of(Time.minutes(1),Time.milliseconds(30*1000)))
       .aggregate(new AggregateFunction[Auction, (Double, Long, Auction), (Auction, Double)] {
       override def createAccumulator(): (Double, Long, Auction) = (0.toDouble, 0L, null)
@@ -47,7 +50,7 @@ class AvgSellingBySeller {
       override def merge(a: (Double, Long, Auction), b: (Double, Long, Auction)): (Double, Long, Auction) = {
         (a._1 + b._1, a._2 + b._2, a._3)
       }
-    })
+    }).setParallelism(22)
     /*result.map(new RichMapFunction[(Auction, Double), (Auction, Double)] {
 
       @transient private var meter: Meter = _
@@ -78,7 +81,7 @@ class AvgSellingBySeller {
     result.map(x =>{
       val currentTime= System.currentTimeMillis()
       (currentTime,x._1.eventTime,currentTime,x._1.eventTime)
-    }).addSink(x=>println(x))//.writeAsText("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/output").setParallelism(1)
+    }).setParallelism(22).addSink(x=>println(x))//.writeAsText("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/output").setParallelism(1)
     env.execute("q6")
   }
 }
