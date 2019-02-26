@@ -10,7 +10,7 @@ import org.apache.flink.metrics.Meter
 import org.apache.flink.streaming.api.functions.{AscendingTimestampExtractor, AssignerWithPunctuatedWatermarks}
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.watermark.Watermark
-import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
+import org.apache.flink.streaming.api.windowing.assigners.{SlidingEventTimeWindows, TumblingEventTimeWindows}
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema
@@ -36,8 +36,8 @@ class AvgSellingBySeller {
       })
 
     val result: DataStream[(Auction, Double)] = auctions.keyBy(_.sellerId)
-      .window(TumblingEventTimeWindows.of(Time.minutes(30)))
-      //.window(SlidingEventTimeWindows.of(Time.minutes(1),Time.milliseconds(30*1000)))
+      //.window(TumblingEventTimeWindows.of(Time.minutes(30)))
+      .window(SlidingEventTimeWindows.of(Time.minutes(30),Time.minutes(10)))
       .aggregate(new AggregateFunction[Auction, (Double, Long, Auction), (Auction, Double)] {
       override def createAccumulator(): (Double, Long, Auction) = (0.toDouble, 0L, null)
 
@@ -80,9 +80,10 @@ class AvgSellingBySeller {
 
     result.map(x =>{
       val currentTime= System.currentTimeMillis()
-      (currentTime,x._1.eventTime,currentTime,x._1.eventTime)
+      (currentTime,x._1.eventTime,x._1.processTime)
     }).name("metrics").uid("metrics").setParallelism(22)
-      .addSink(x=>println(x)).name("sink").uid("sink").setParallelism(1)//.writeAsText("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/output").setParallelism(1)
+      .addSink(x=>println(x)).setParallelism(1).name("sink").uid("sink")
+      //.writeAsText("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/output").setParallelism(1).name("sink").uid("sink")
     env.execute("q6")
   }
 }
