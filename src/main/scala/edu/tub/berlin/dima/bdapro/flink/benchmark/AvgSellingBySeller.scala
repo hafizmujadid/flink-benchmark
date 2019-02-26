@@ -30,9 +30,10 @@ class AvgSellingBySeller {
         val tokens = value.split(",")
         Auction(tokens(0).toLong, tokens(1).toLong, tokens(2).toLong, tokens(3).toLong,
           tokens(4).toDouble, tokens(5).toLong, tokens(6).toLong, System.currentTimeMillis())
-      }).assignTimestampsAndWatermarks(new AscendingTimestampExtractor[Auction] {
-        override def extractAscendingTimestamp(t: Auction): Long = t.eventTime
       }).name("map_auction").uid("map_auction").setParallelism(22)
+      .assignTimestampsAndWatermarks(new AscendingTimestampExtractor[Auction] {
+        override def extractAscendingTimestamp(t: Auction): Long = t.eventTime
+      })
 
     val result: DataStream[(Auction, Double)] = auctions.keyBy(_.sellerId)
       .window(TumblingEventTimeWindows.of(Time.minutes(30)))
