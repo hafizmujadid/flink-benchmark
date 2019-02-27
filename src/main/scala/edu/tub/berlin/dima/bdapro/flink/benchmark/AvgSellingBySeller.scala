@@ -36,8 +36,8 @@ class AvgSellingBySeller {
       })
 
     val result: DataStream[(Auction, Double)] = auctions.keyBy(_.sellerId)
-      //.window(TumblingEventTimeWindows.of(Time.minutes(30)))
-      .window(SlidingEventTimeWindows.of(Time.minutes(30),Time.minutes(10)))
+      .window(TumblingEventTimeWindows.of(Time.minutes(30)))
+      //.window(SlidingEventTimeWindows.of(Time.minutes(30),Time.minutes(10)))
       .aggregate(new AggregateFunction[Auction, (Double, Long, Auction), (Auction, Double)] {
       override def createAccumulator(): (Double, Long, Auction) = (0.toDouble, 0L, null)
 
@@ -82,8 +82,8 @@ class AvgSellingBySeller {
       val currentTime= System.currentTimeMillis()
       (currentTime,x._1.eventTime,x._1.processTime)
     }).name("metrics").uid("metrics").setParallelism(22)
-      .addSink(x=>println(x)).setParallelism(1).name("sink").uid("sink")
-      //.writeAsText("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/output").setParallelism(1).name("sink").uid("sink")
+      //.addSink(x=>println(x)).setParallelism(1).name("sink").uid("sink")
+      .writeAsText("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/output").setParallelism(1).name("sink").uid("sink")
     env.execute("q6")
   }
 }
