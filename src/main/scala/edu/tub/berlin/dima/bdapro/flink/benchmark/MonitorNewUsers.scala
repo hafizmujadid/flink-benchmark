@@ -94,7 +94,7 @@ class MonitorNewUsers {
 
     result.map(value =>(System.currentTimeMillis(), value._3,value._4))
       .name("metrics").uid("metrics").setParallelism(22)
-      .writeAsText("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/sliding_q8_inc").setParallelism(1).name("sink").uid("sink")
+      .writeAsText("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/sliding_q8_full").setParallelism(1).name("sink").uid("sink")
     env.execute("q8")
   }
 
