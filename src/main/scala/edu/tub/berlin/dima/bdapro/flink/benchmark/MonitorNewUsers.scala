@@ -61,7 +61,7 @@ class MonitorNewUsers {
       .apply { (person, auction) => {
       val processTime = if (person.processTime > auction.processTime) person.processTime else auction.processTime
       val eventTime = if (person.eventTime > auction.eventTime) person.eventTime else auction.eventTime
-      (person.personId, person.name, processTime, eventTime)
+      (person.personId, person.name, eventTime,processTime)
      }
     }.name("result").uid("result").setParallelism(22)
 
@@ -92,10 +92,9 @@ class MonitorNewUsers {
       }
     })*/
 
-    result.map(value =>{
-      (System.currentTimeMillis(), value._4,value._4)
-    }).name("metrics").uid("metrics").setParallelism(22)
-      .writeAsCsv("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/tumbling_q8_inc").setParallelism(1).name("sink").uid("sink")
+    result.map(value =>(System.currentTimeMillis(), value._3,value._4))
+      .name("metrics").uid("metrics").setParallelism(22)
+      .writeAsText("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/tumbling_q8_inc").setParallelism(1).name("sink").uid("sink")
     env.execute("q8")
   }
 
