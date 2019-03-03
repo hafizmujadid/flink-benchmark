@@ -8,7 +8,7 @@ object Aggregator {
 
   def main(args: Array[String]): Unit = {
     val env = ExecutionEnvironment.getExecutionEnvironment
-    val data = env.readTextFile("file:///home/hadoop/tumbling_q8_inc.csv").filter(!_.isEmpty).map(x => {
+    val data = env.readTextFile("file:///home/hadoop/tumbling_q8_full.csv").filter(!_.isEmpty).map(x => {
       val tokens = x.drop(1).dropRight(1).split(",").map(_.toLong)
       Result(tokens(0), tokens(1), tokens(2))
     }).map(x => {
@@ -28,9 +28,9 @@ object Aggregator {
         (a._1, a._2 + b._2, a._3 + b._3)
       }).map(x => (x._1, x._2.toFloat / x._3))
 
-    throughput.writeAsCsv("file:///home/hadoop/mujadid_throughput.csv").setParallelism(1)
-    eventTimeLatency.writeAsCsv("file:///home/hadoop/mujadid_event.csv").setParallelism(1)
-    processTimeLatency.writeAsCsv("file:///home/hadoop/mujadid_process.csv").setParallelism(1)
+    throughput.writeAsCsv("file:///home/hadoop/tumbling_q8_full_throughput.csv").setParallelism(1)
+    eventTimeLatency.writeAsCsv("file:///home/hadoop/tumbling_q8_full_event.csv").setParallelism(1)
+    processTimeLatency.writeAsCsv("file:///home/hadoop/tumbling_q8_full_process.csv").setParallelism(1)
 
     env.execute("metrices")
 

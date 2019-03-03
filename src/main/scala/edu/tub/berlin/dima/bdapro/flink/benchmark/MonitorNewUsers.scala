@@ -56,8 +56,8 @@ class MonitorNewUsers {
     val result: DataStream[(Long, String, Long, Long)] = persons.join(auctions)
       .where(p => p.personId)
       .equalTo(auction => auction.sellerId)
-      .window(TumblingEventTimeWindows.of(Time.minutes(30)))
-      //.window(SlidingEventTimeWindows.of(Time.minutes(30),Time.minutes(15)))
+      //.window(TumblingEventTimeWindows.of(Time.minutes(30)))
+      .window(SlidingEventTimeWindows.of(Time.minutes(30),Time.minutes(10)))
       .apply { (person, auction) => {
       val processTime = if (person.processTime > auction.processTime) person.processTime else auction.processTime
       val eventTime = if (person.eventTime > auction.eventTime) person.eventTime else auction.eventTime
