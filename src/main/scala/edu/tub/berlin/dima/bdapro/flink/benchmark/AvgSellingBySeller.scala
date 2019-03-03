@@ -51,6 +51,7 @@ class AvgSellingBySeller {
         (a._1 + b._1, a._2 + b._2, a._3)
       }
     }).name("avg").uid("avg").setParallelism(22)
+
     /*result.map(new RichMapFunction[(Auction, Double), (Auction, Double)] {
 
       @transient private var meter: Meter = _

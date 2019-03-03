@@ -15,12 +15,12 @@ object App {
     env.enableCheckpointing(JobConfig.CHECKPOINT_INTERVAL)
     //env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3, Time.of(60, TimeUnit.SECONDS) ))
     val rocksDBStateBackend: RocksDBStateBackend = new RocksDBStateBackend(JobConfig.CHECKPOINT_DIR,
-      false)
+      true)
     //rocksDBStateBackend.setPredefinedOptions(PredefinedOptions.SPINNING_DISK_OPTIMIZED_HIGH_MEM)
     env.setStateBackend(rocksDBStateBackend)
     //env.setStateBackend(new FsStateBackend(JobConfig.CHECKPOINT_DIR))
 
-    val query = new AvgSellingBySeller
+    val query = new MonitorNewUsers
     query.run(env)
   }
 }
