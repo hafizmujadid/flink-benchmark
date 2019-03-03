@@ -8,7 +8,7 @@ object Aggregator {
 
   def main(args: Array[String]): Unit = {
     val env = ExecutionEnvironment.getExecutionEnvironment
-    val data = env.readTextFile("file:///home/hadoop/output.csv").filter(!_.isEmpty).map(x => {
+    val data = env.readTextFile("file:///home/hadoop/tumbling_q8_inc.csv").filter(!_.isEmpty).map(x => {
       val tokens = x.drop(1).dropRight(1).split(",").map(_.toLong)
       Result(tokens(0), tokens(1), tokens(2))
     }).map(x => {

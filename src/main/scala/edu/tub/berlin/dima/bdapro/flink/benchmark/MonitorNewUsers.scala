@@ -63,7 +63,7 @@ class MonitorNewUsers {
       val eventTime = if (person.eventTime > auction.eventTime) person.eventTime else auction.eventTime
       (person.personId, person.name, eventTime,processTime)
      }
-    }.name("result").uid("result").setParallelism(22)
+    }.name("joined-stream").uid("joined-stream").setParallelism(22)
 
     /*result.map(new RichMapFunction[(Long, String, Long, Long), (Long, String, Long, Long)] {
 
