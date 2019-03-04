@@ -1,4 +1,3 @@
-/*
 package edu.tub.berlin.dima.bdapro.flink.benchmark;
 
 import edu.tub.berlin.dima.bdapro.flink.benchmark.models.Bid;
@@ -30,7 +29,7 @@ public class HighestBid {
 
     public void run(StreamExecutionEnvironment env){
         Properties properties = new Properties();
-        properties.setProperty("bootstrap.servers", "localhost:9092");
+        properties.setProperty("bootstrap.servers",JobConfig.BOOTSTRAP_SERVER());
         properties.setProperty("group.id", "test");
         DataStream<String> stream = env
                 .addSource(new FlinkKafkaConsumer011<>(JobConfig.BID_TOPIC(),
@@ -114,4 +113,3 @@ public class HighestBid {
                 .setParallelism(22).writeAsCsv("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/tumbling_q8_inc").setParallelism(1);
     }
 }
-*/

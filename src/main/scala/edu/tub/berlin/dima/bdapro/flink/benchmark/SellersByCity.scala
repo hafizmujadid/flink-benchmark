@@ -17,7 +17,7 @@ import org.apache.flink.streaming.util.serialization.SimpleStringSchema
 import org.apache.flink.util.Collector
 import org.slf4j.{Logger, LoggerFactory}
 
-class TopSellersByCity {
+class SellersByCity {
   def run(env:StreamExecutionEnvironment): Unit ={
 
 
@@ -62,12 +62,11 @@ class TopSellersByCity {
       .where(b=>b.bidderId)
       .equalTo(p=>p.personId)
       .window(TumblingEventTimeWindows.of(Time.minutes(30)))
-      //.window(SlidingEventTimeWindows.of(Time.seconds(60),Time.seconds(20)))
       .apply((bid,person) =>{
         val processingTime= if(person.processTime>bid.processingTime) person.processTime else bid.processingTime
         val eventTime = if(person.eventTime>bid.eventTime) person.eventTime else bid.eventTime
         (bid.bidderId,person.city,eventTime,processingTime,bid.price,1)
-      })
+      }).name("joined_stream").uid("joined_stream").setParallelism(22)
       .keyBy(_._2)
       .window(TumblingEventTimeWindows.of(Time.minutes(30)))
       //.window(SlidingEventTimeWindows.of(Time.seconds(60),Time.seconds(20)))
@@ -76,7 +75,7 @@ class TopSellersByCity {
         val processingTime = in.iterator.minBy(x=>x._4)._4
         val eventTime = in.iterator.minBy(x=>x._3)._3
         out.collect((key,countByCity,eventTime,processingTime))
-      }).name("avg").uid("avg").setParallelism(22)
+      }).name("sellers_per_city").uid("sellers_per_city").setParallelism(22)
 
     /*result.map(new RichMapFunction[(String, Int,Long,Long),(String, Int, Long, Long)] {
       @transient private var processTimeLatency: Long = 0
