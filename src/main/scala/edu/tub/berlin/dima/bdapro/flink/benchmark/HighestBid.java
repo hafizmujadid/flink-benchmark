@@ -1,3 +1,4 @@
+/*
 package edu.tub.berlin.dima.bdapro.flink.benchmark;
 
 import edu.tub.berlin.dima.bdapro.flink.benchmark.models.Bid;
@@ -112,4 +113,4 @@ public class HighestBid {
         temp.map(tuple -> new Tuple3<>(System.currentTimeMillis(), tuple.f2, tuple.f3))
                 .setParallelism(22).writeAsCsv("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/tumbling_q8_inc").setParallelism(1);
     }
-}
+}*/
