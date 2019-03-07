@@ -52,7 +52,7 @@ class WordCountStream {
     }
 
     def process(key: String, context: Context, input: Iterable[(Long,String,Long)],
-                out: Collector[(String,Long,Long,Long)]): () = {
+                out: Collector[(String,Long,Long,Long)]):Unit  = {
       var count = 0L
       var eventTime=0L
       var processTime = 0L
