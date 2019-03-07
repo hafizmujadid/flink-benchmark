@@ -30,14 +30,14 @@ class AvgSellingBySeller {
         val tokens = value.split(",")
         Auction(tokens(0).toLong, tokens(1).toLong, tokens(2).toLong, tokens(3).toLong,
           tokens(4).toDouble, tokens(5).toLong, tokens(6).toLong, System.currentTimeMillis())
-      }).name("map_auction").uid("map_auction").setParallelism(22)
+      }).name("map_auction").uid("map_auction").setParallelism(12)
       .assignTimestampsAndWatermarks(new AscendingTimestampExtractor[Auction] {
         override def extractAscendingTimestamp(t: Auction): Long = t.eventTime
       })
 
     val result: DataStream[(Auction, Double)] = auctions.keyBy(_.sellerId)
-      //.window(TumblingEventTimeWindows.of(Time.minutes(30)))
-      .window(SlidingEventTimeWindows.of(Time.minutes(30),Time.minutes(10)))
+      .window(TumblingEventTimeWindows.of(Time.minutes(30)))
+      //.window(SlidingEventTimeWindows.of(Time.minutes(30),Time.minutes(10)))
       .aggregate(new AggregateFunction[Auction, (Double, Long, Auction), (Auction, Double)] {
       override def createAccumulator(): (Double, Long, Auction) = (0.toDouble, 0L, null)
 
@@ -50,7 +50,7 @@ class AvgSellingBySeller {
       override def merge(a: (Double, Long, Auction), b: (Double, Long, Auction)): (Double, Long, Auction) = {
         (a._1 + b._1, a._2 + b._2, a._3)
       }
-    }).name("avg").uid("avg").setParallelism(22)
+    }).name("avg").uid("avg").setParallelism(12)
 
     /*result.map(new RichMapFunction[(Auction, Double), (Auction, Double)] {
 
@@ -82,7 +82,7 @@ class AvgSellingBySeller {
     result.map(x =>{
       val currentTime= System.currentTimeMillis()
       (currentTime,x._1.eventTime,x._1.processTime)
-    }).name("metrics").uid("metrics").setParallelism(22)
+    }).name("metrics").uid("metrics").setParallelism(12)
       //.addSink(x=>println(x)).setParallelism(1).name("sink").uid("sink")
       .writeAsText("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/output").setParallelism(1).name("sink").uid("sink")
     env.execute("q6")
