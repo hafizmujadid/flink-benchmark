@@ -3,7 +3,7 @@ package edu.tub.berlin.dima.bdapro.flink.benchmark
 import java.util.Properties
 
 import org.apache.flink.api.common.state.{ValueState, ValueStateDescriptor}
-import org.apache.flink.api.common.time.Time
+import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.api.common.typeinfo.{TypeHint, TypeInformation}
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.streaming.api.functions.AscendingTimestampExtractor
@@ -33,7 +33,7 @@ class WordCountStream {
     }).name("word_count_source").uid("word_count_source").setParallelism(22)
       .assignTimestampsAndWatermarks(new AscendingTimestampExtractor[(Long,String,Long)] {
         override def extractAscendingTimestamp(t: (Long,String,Long)): Long = t._1
-      }).keyBy(_._2).window(new TumblingEventTimeWindows(Time.minutes(10)))
+      }).keyBy(_._2).window(TumblingEventTimeWindows.of(Time.minutes(30)))
       .process(new WordCountProcessFunction)
 
   }
