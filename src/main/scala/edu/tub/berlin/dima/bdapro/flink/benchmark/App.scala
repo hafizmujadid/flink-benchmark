@@ -20,7 +20,7 @@ object App {
     env.setStateBackend(rocksDBStateBackend)
     //env.setStateBackend(new FsStateBackend(JobConfig.CHECKPOINT_DIR))
 
-    val query = new AvgSellingBySeller
+    val query = new WordCountStream
     query.run(env)
   }
 }

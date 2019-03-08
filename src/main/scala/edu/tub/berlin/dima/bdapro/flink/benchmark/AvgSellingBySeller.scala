@@ -2,15 +2,10 @@ package edu.tub.berlin.dima.bdapro.flink.benchmark
 import java.util.Properties
 
 import edu.tub.berlin.dima.bdapro.flink.benchmark.models.Auction
-import org.apache.flink.api.common.functions.{AggregateFunction, RichMapFunction}
-import org.apache.flink.api.scala.metrics.ScalaGauge
-import org.apache.flink.configuration.Configuration
-import org.apache.flink.dropwizard.metrics.DropwizardMeterWrapper
-import org.apache.flink.metrics.Meter
-import org.apache.flink.streaming.api.functions.{AscendingTimestampExtractor, AssignerWithPunctuatedWatermarks}
+import org.apache.flink.api.common.functions.AggregateFunction
+import org.apache.flink.streaming.api.functions.AscendingTimestampExtractor
 import org.apache.flink.streaming.api.scala._
-import org.apache.flink.streaming.api.watermark.Watermark
-import org.apache.flink.streaming.api.windowing.assigners.{SlidingEventTimeWindows, TumblingEventTimeWindows}
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema
@@ -52,39 +47,13 @@ class AvgSellingBySeller {
       }
     }).name("avg").uid("avg").setParallelism(12)
 
-    /*result.map(new RichMapFunction[(Auction, Double), (Auction, Double)] {
-
-      @transient private var meter: Meter = _
-      @transient private var processTimeLatency: Long = 0L
-      @transient private var eventTimeLatency: Long = 0L
-
-      override def open(parameters: Configuration): Unit = {
-        super.open(parameters)
-        val dropWizardMeter: com.codahale.metrics.Meter = new com.codahale.metrics.Meter()
-        meter = getRuntimeContext
-          .getMetricGroup.meter("Throughput", new DropwizardMeterWrapper(dropWizardMeter))
-        getRuntimeContext
-          .getMetricGroup
-          .gauge[Long, ScalaGauge[Long]]("pLatency", ScalaGauge[Long](() => processTimeLatency))
-        getRuntimeContext
-          .getMetricGroup
-          .gauge[Long, ScalaGauge[Long]]("eLatency", ScalaGauge[Long](() => processTimeLatency))
-      }
-
-      override def map(value: (Auction, Double)): (Auction, Double) = {
-        processTimeLatency = System.currentTimeMillis() - value._1.processTime
-        eventTimeLatency = System.currentTimeMillis() - value._1.eventTime
-        meter.markEvent()
-        value
-      }
-    }).addSink(x=> println(x._2))*/
 
     result.map(x =>{
       val currentTime= System.currentTimeMillis()
       (currentTime,x._1.eventTime,x._1.processTime)
     }).name("metrics").uid("metrics").setParallelism(12)
-      //.addSink(x=>println(x)).setParallelism(1).name("sink").uid("sink")
       .writeAsText("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/output").setParallelism(1).name("sink").uid("sink")
+
     env.execute("q6")
   }
 }
