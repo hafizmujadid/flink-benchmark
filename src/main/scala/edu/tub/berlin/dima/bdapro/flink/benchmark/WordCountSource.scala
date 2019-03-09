@@ -42,7 +42,7 @@ class WordCountSource extends ParallelSourceFunction[String]{
 
     while (true){
       sourceContext.collect(data)
-      Thread.sleep(1000)
+      Thread.sleep(30)
     }
   }
 
