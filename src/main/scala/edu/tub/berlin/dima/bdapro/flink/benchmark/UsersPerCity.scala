@@ -11,7 +11,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema
 import org.apache.flink.util.Collector
 
-class SellersByCity {
+class UsersPerCity {
   def run(env:StreamExecutionEnvironment): Unit ={
 
 
