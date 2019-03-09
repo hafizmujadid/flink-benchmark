@@ -53,7 +53,6 @@ class AvgSellingBySeller {
       (currentTime,x._1.eventTime,x._1.processTime)
     }).name("metrics").uid("metrics").setParallelism(12)
       .writeAsText("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/output").setParallelism(1).name("sink").uid("sink")
-
     env.execute("q6")
   }
 }
