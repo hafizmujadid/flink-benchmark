@@ -3,7 +3,10 @@ package edu.tub.berlin.dima.bdapro.flink.benchmark
 import java.util.Properties
 
 import edu.tub.berlin.dima.bdapro.flink.benchmark.models.Person
+import org.apache.flink.api.common.serialization.SimpleStringEncoder
+import org.apache.flink.core.fs.Path
 import org.apache.flink.streaming.api.functions.AscendingTimestampExtractor
+import org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
@@ -49,10 +52,15 @@ class UsersPerCity {
         out.collect((key,countByCity,eventTime,processingTime))
       }).name("sellers_per_city").uid("sellers_per_city")//.setParallelism(22)
 
+    val sink: StreamingFileSink[String] = StreamingFileSink
+      .forRowFormat(new Path("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/tumbling_qnew_inc"), new SimpleStringEncoder[String]("UTF-8"))
+      .build()
+
     result.map(value =>{
-      (System.currentTimeMillis(),value._3,value._4)
+      System.currentTimeMillis()+","+value._3+","+value._4
     }).name("metrics").uid("metrics")//.setParallelism(22)
-      .writeAsCsv("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/tumbling_qnew_inc")//.setParallelism(1).name("sink").uid("sink")
+        .addSink(sink)
+      //.writeAsCsv("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/tumbling_qnew_inc")//.setParallelism(1).name("sink").uid("sink")
 
     env.execute("qnew")
 
