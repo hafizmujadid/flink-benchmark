@@ -65,33 +65,6 @@ class MonitorNewUsers {
      }
     }.name("joined-stream").uid("joined-stream").setParallelism(22)
 
-    /*result.map(new RichMapFunction[(Long, String, Long, Long), (Long, String, Long, Long)] {
-
-      @transient private var processTimeLatency: Long = 0
-      @transient private var eventTimeLatency: Long = 0
-      @transient private var meter: Meter = _
-
-      override def open(parameters: Configuration): Unit = {
-        super.open(parameters)
-        val dropWizardMeter: com.codahale.metrics.Meter = new com.codahale.metrics.Meter()
-        meter = getRuntimeContext
-          .getMetricGroup.meter("Throughput", new DropwizardMeterWrapper(dropWizardMeter))
-        getRuntimeContext
-          .getMetricGroup
-          .gauge[Long, ScalaGauge[Long]]("eLatency", ScalaGauge[Long](() => eventTimeLatency))
-        getRuntimeContext
-          .getMetricGroup
-          .gauge[Long, ScalaGauge[Long]]("pLatency", ScalaGauge[Long](() => processTimeLatency))
-      }
-
-      override def map(value: (Long, String, Long, Long)): (Long, String, Long, Long) = {
-        processTimeLatency = System.currentTimeMillis() - value._3
-        eventTimeLatency = System.currentTimeMillis() - value._4
-        this.meter.markEvent()
-        value
-      }
-    })*/
-
     result.map(value =>(System.currentTimeMillis(), value._3,value._4))
       .name("metrics").uid("metrics").setParallelism(22)
       .writeAsText("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/sliding_q8_full").setParallelism(1).name("sink").uid("sink")

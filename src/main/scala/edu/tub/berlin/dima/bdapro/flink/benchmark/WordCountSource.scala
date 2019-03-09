@@ -38,6 +38,17 @@ class WordCountSource extends ParallelSourceFunction[String]{
         |Sed sed leo sed orci pellentesque ultrices. Mauris sollicitudin, sem quis placerat ornare,
         |velit arcu convallis ligula, pretium finibus nisl sapien vel sem.
         |Vivamus sit amet tortor id lorem consequat hendrerit. Nullam at dui risus.
+        |Nulla luctus sem sit amet nisi consequat, id ornare ipsum dignissim.
+        |Sed elementum elit nibh, eu condimentum orci viverra quis.
+        |Aenean suscipit vitae felis non suscipit. Suspendisse pharetra turpis non eros semper dictum.
+        |Etiam tincidunt venenatis venenatis. Praesent eget gravida lorem, ut congue diam.
+        |Etiam facilisis elit at porttitor egestas. Praesent consequat, velit non vulputate convallis,
+        |ligula diam sagittis urna, in venenatis nisi justo ut mauris. Vestibulum posuere sollicitudin mi,
+        |et vulputate nisl fringilla non. Nulla ornare pretium velit a euismod.
+        |Nunc sagittis venenatis vestibulum. Nunc sodales libero a est ornare ultricies.
+        |Sed sed leo sed orci pellentesque ultrices. Mauris sollicitudin, sem quis placerat ornare,
+        |velit arcu convallis ligula, pretium finibus nisl sapien vel sem.
+        |Vivamus sit amet tortor id lorem consequat hendrerit. Nullam at dui risus.
       """.stripMargin
 
     while (true){

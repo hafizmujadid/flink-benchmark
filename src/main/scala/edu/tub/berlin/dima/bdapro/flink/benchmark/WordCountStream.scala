@@ -17,7 +17,6 @@ class WordCountStream {
         override def extractAscendingTimestamp(t: String): Long = System.currentTimeMillis()
       }).flatMap(_.toLowerCase.split("\\W+"))
       .filter(_.nonEmpty)
-      .filter(_.length>3)
       .map((_, 1))
       .keyBy(_._1)
       .window(TumblingEventTimeWindows.of(Time.minutes(30)))
