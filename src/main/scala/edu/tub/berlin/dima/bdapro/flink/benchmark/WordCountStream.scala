@@ -13,9 +13,9 @@ import org.apache.flink.streaming.util.serialization.SimpleStringSchema
 class WordCountStream {
   def run(env: StreamExecutionEnvironment): Unit ={
     env.addSource(new WordCountSource)
-      .assignTimestampsAndWatermarks(new AscendingTimestampExtractor[String] {
-        override def extractAscendingTimestamp(t: String): Long = System.currentTimeMillis()
-      }).flatMap(_.toLowerCase.split("\\W+"))
+      .assignTimestampsAndWatermarks(new AscendingTimestampExtractor[(String,Long)] {
+        override def extractAscendingTimestamp(t: (String,Long)): Long = t._2
+      }).flatMap(_._1.toLowerCase.split("\\W+"))
       .filter(_.nonEmpty)
       .map((_, 1))
       .keyBy(_._1)

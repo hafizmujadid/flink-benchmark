@@ -4,9 +4,9 @@ import java.util.Random
 
 import org.apache.flink.streaming.api.functions.source.{ParallelSourceFunction, SourceFunction}
 
-class WordCountSource extends ParallelSourceFunction[String]{
+class WordCountSource extends ParallelSourceFunction[(String,Long)]{
   var running = true
-  override def run(sourceContext: SourceFunction.SourceContext[String]): Unit = {
+  override def run(sourceContext: SourceFunction.SourceContext[(String,Long)]): Unit = {
     val data =
       """
         |Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum sagittis lacus,
@@ -73,7 +73,7 @@ class WordCountSource extends ParallelSourceFunction[String]{
       """.stripMargin
 
     while (true){
-      sourceContext.collect(data)
+      sourceContext.collect((data,System.currentTimeMillis()))
       Thread.sleep(30)
     }
   }
