@@ -14,7 +14,7 @@ class WordCountStream {
   def run(env: StreamExecutionEnvironment): Unit ={
     env.addSource(new WordCountSource)
       .assignTimestampsAndWatermarks(new AscendingTimestampExtractor[(String,Long)] {
-        override def extractAscendingTimestamp(t: (String,Long)): Long = t._2
+        override def extractAscendingTimestamp(t: (String,Long)): Long = System.currentTimeMillis()
       }).flatMap(_._1.toLowerCase.split("\\W+"))
       .filter(_.nonEmpty)
       .map((_, 1))
