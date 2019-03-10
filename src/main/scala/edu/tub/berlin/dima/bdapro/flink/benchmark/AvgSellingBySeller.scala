@@ -45,7 +45,7 @@ class AvgSellingBySeller {
       override def merge(a: (Double, Long, Auction), b: (Double, Long, Auction)): (Double, Long, Auction) = {
         (a._1 + b._1, a._2 + b._2, a._3)
       }
-    }).name("avg").uid("avg").setParallelism(12)
+    }).name("avg_bid_price").uid("avg_bid_price").setParallelism(12)
 
 
     result.map(x =>{

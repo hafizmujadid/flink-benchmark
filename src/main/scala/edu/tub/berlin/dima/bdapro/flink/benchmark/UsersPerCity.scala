@@ -50,16 +50,17 @@ class UsersPerCity {
         val processingTime = in.iterator.maxBy(x=>x.processTime).processTime
         val eventTime = in.iterator.maxBy(x=>x.eventTime).eventTime
         out.collect((key,countByCity,eventTime,processingTime))
-      }).name("sellers_per_city").uid("sellers_per_city")//.setParallelism(22)
+      }).name("users_per_city").uid("users_per_city")//.setParallelism(22)
 
     val sink: StreamingFileSink[String] = StreamingFileSink
       .forRowFormat(new Path("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/tumbling_qnew_inc"), new SimpleStringEncoder[String]("UTF-8"))
       .build()
 
+
     result.map(value =>{
       System.currentTimeMillis()+","+value._3+","+value._4
     }).name("metrics").uid("metrics")//.setParallelism(22)
-        .addSink(sink)
+        .addSink(sink).name("sink")
       //.writeAsCsv("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/tumbling_qnew_inc")//.setParallelism(1).name("sink").uid("sink")
 
     env.execute("qnew")
