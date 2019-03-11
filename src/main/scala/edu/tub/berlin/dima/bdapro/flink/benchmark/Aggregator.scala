@@ -2,6 +2,10 @@ package edu.tub.berlin.dima.bdapro.flink.benchmark
 import org.apache.flink.api.scala.ExecutionEnvironment
 import org.apache.flink.streaming.api.scala._
 
+/**
+  * Batch job to aggregates the metrices like throughput, latencies
+  * @author Mujadid Khalid
+  */
 object Aggregator {
 
   case class Result(timestamp: Long, eventTime: Long, processingTime: Long)
@@ -18,7 +22,7 @@ object Aggregator {
     val throughput = data.map(x => (x.timestamp, 1)).groupBy(0)
       .reduce((a, b) => (a._1, a._2 + b._2))
 
-    /*val eventTimeLatency = data.map(x => (x.timestamp, x.eventTime, 1)).groupBy(0)
+    val eventTimeLatency = data.map(x => (x.timestamp, x.eventTime, 1)).groupBy(0)
       .reduce((a, b) => {
         (a._1, a._2 + b._2, a._3 + b._3)
       }).map(x => (x._1, x._2.toFloat / x._3))
@@ -26,11 +30,11 @@ object Aggregator {
     val processTimeLatency = data.map(x => (x.timestamp, x.processingTime, 1)).groupBy(0)
       .reduce((a, b) => {
         (a._1, a._2 + b._2, a._3 + b._3)
-      }).map(x => (x._1, x._2.toFloat / x._3))*/
+      }).map(x => (x._1, x._2.toFloat / x._3))
 
     throughput.writeAsCsv("file:///home/hadoop/sliding_q8_full_throughput.csv").setParallelism(1)
-    //eventTimeLatency.writeAsCsv("file:///home/hadoop/sliding_q8_full_event.csv").setParallelism(1)
-    //processTimeLatency.writeAsCsv("file:///home/hadoop/sliding_q8_full_process.csv").setParallelism(1)
+    eventTimeLatency.writeAsCsv("file:///home/hadoop/sliding_q8_full_event.csv").setParallelism(1)
+    processTimeLatency.writeAsCsv("file:///home/hadoop/sliding_q8_full_process.csv").setParallelism(1)
 
     env.execute("metrices")
 

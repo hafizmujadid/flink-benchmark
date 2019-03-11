@@ -3,19 +3,22 @@ package edu.tub.berlin.dima.bdapro.flink.benchmark
 import java.util.Properties
 
 import edu.tub.berlin.dima.bdapro.flink.benchmark.models.{Auction, Person}
-import org.apache.flink.api.common.functions.RichMapFunction
-import org.apache.flink.api.scala.metrics.ScalaGauge
-import org.apache.flink.configuration.Configuration
-import org.apache.flink.dropwizard.metrics.DropwizardMeterWrapper
-import org.apache.flink.metrics.Meter
 import org.apache.flink.streaming.api.functions.AscendingTimestampExtractor
 import org.apache.flink.streaming.api.scala._
-import org.apache.flink.streaming.api.windowing.assigners.{SlidingEventTimeWindows, TumblingEventTimeWindows}
+import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema
 
+/**
+  * implements query 8 monitor new user from nexmark benchmark
+  * @author Hafiz Mujadid Khalid
+  */
 class MonitorNewUsers {
+  /**
+    * run method to run the query
+    * @param env
+    */
   def run(env: StreamExecutionEnvironment): Unit = {
 
 

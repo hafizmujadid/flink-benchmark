@@ -5,8 +5,17 @@ import org.apache.flink.streaming.api.functions.source.{ParallelSourceFunction, 
 
 import scala.util.Random
 
+/**
+  * Parallel data source to generate Bid events for testing
+  * @author Hafiz Mujadid Khalid
+  */
 class BidSource extends ParallelSourceFunction[Bid]{
   var running = true
+
+  /**
+    * start generating events
+    * @param ctx
+    */
   override def run(ctx: SourceFunction.SourceContext[Bid]): Unit = {
     val random= new Random()
     for(i<- 0 until 100 if running){

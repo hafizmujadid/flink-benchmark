@@ -7,9 +7,11 @@ import org.apache.flink.streaming.api.functions.AscendingTimestampExtractor
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
-import org.apache.flink.streaming.util.serialization.SimpleStringSchema
 
+/**
+  * Word count job in flink
+  * @author Hafiz Mujadid Khalid
+  */
 class WordCountStream {
   def run(env: StreamExecutionEnvironment): Unit ={
     env.addSource(new WordCountSource)

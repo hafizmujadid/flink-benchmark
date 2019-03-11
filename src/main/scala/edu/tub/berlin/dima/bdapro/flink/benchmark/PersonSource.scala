@@ -2,9 +2,17 @@ package edu.tub.berlin.dima.bdapro.flink.benchmark
 
 import edu.tub.berlin.dima.bdapro.flink.benchmark.models.Person
 import org.apache.flink.streaming.api.functions.source.{ParallelSourceFunction, SourceFunction}
-
+/**
+  * Simple Person data generator source for testing on local without kafka
+  * @author Hafiz Mujadid Khalid
+  */
 class PersonSource extends ParallelSourceFunction[Person]{
   var running = true
+
+  /**
+    *
+    * @param ctx SourceContext to write events to source
+    */
   override def run(ctx: SourceFunction.SourceContext[Person]): Unit = {
     val cities =Array("Berling","Frankfurt","Hamburg")
     for(i<- 0 until 100 if running){

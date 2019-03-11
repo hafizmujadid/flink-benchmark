@@ -9,7 +9,15 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindo
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema
+
+/**
+  * @author Hafiz Mujadid Khalid
+  */
 class AvgSellingBySeller {
+  /**
+    *  to run average selling price per seller query.
+    * @param env execution environment
+    */
   def run(env:StreamExecutionEnvironment): Unit = {
     val properties = new Properties()
     properties.setProperty("bootstrap.servers", JobConfig.BOOTSTRAP_SERVER)

@@ -3,10 +3,7 @@ package edu.tub.berlin.dima.bdapro.flink.benchmark
 import java.util.Properties
 
 import edu.tub.berlin.dima.bdapro.flink.benchmark.models.Person
-import org.apache.flink.api.common.serialization.SimpleStringEncoder
-import org.apache.flink.core.fs.Path
 import org.apache.flink.streaming.api.functions.AscendingTimestampExtractor
-import org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
@@ -14,25 +11,25 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema
 import org.apache.flink.util.Collector
 
+/**
+  * @author Hafiz Mujadid Khalid
+  *  implements query to count persons per city
+  */
 class UsersPerCity {
+  /**
+    * run method to initiate execution
+    * @param env
+    */
   def run(env:StreamExecutionEnvironment): Unit ={
-
 
     val properties = new Properties()
     properties.setProperty("bootstrap.servers", JobConfig.BOOTSTRAP_SERVER)
-    // only required for Kafka 0.8
-    //properties.setProperty("zookeeper.connect", "localhost:2181")
     properties.setProperty("group.id", "test")
-
-    /*
-        val persons = env.addSource(new PersonSource).assignAscendingTimestamps(_.eventTime).name("person_stream").uid("person_stream")
-    */
-    //Person object
 
     val persons = env
       .addSource(new
           FlinkKafkaConsumer011[String](JobConfig.PERSON_TOPIC, new SimpleStringSchema(), properties)
-        .setStartFromEarliest())/*.setParallelism(2)*/.map(value => {
+        .setStartFromEarliest()).setParallelism(2).map(value => {
         val tokens = value.split(",")
         Person(tokens(0).toLong, tokens(1), tokens(2),
           tokens(3), tokens(4), tokens(5), tokens(6).toLong,System.currentTimeMillis())
@@ -50,18 +47,12 @@ class UsersPerCity {
         val processingTime = in.iterator.maxBy(x=>x.processTime).processTime
         val eventTime = in.iterator.maxBy(x=>x.eventTime).eventTime
         out.collect((key,countByCity,eventTime,processingTime))
-      }).name("users_per_city").uid("users_per_city")//.setParallelism(22)
-
-    val sink: StreamingFileSink[String] = StreamingFileSink
-      .forRowFormat(new Path("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/tumbling_qnew_inc"), new SimpleStringEncoder[String]("UTF-8"))
-      .build()
-
+      }).name("users_per_city").uid("users_per_city").setParallelism(22)
 
     result.map(value =>{
       System.currentTimeMillis()+","+value._3+","+value._4
-    }).name("metrics").uid("metrics")//.setParallelism(22)
-        .addSink(sink).name("sink")
-      //.writeAsCsv("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/tumbling_qnew_inc")//.setParallelism(1).name("sink").uid("sink")
+    }).name("metrics").uid("metrics").setParallelism(22)
+      .writeAsCsv("hdfs://ibm-power-1.dima.tu-berlin.de:44000/issue13/tumbling_qnew_inc")//.setParallelism(1).name("sink").uid("sink")
 
     env.execute("qnew")
 

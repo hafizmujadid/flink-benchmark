@@ -1,5 +1,8 @@
 package edu.tub.berlin.dima.bdapro.flink.benchmark
 
+/**
+  * Sorts and aggregates per minute metrices
+  */
 object Sorter {
   def main(args: Array[String]): Unit = {
     val prefix ="/home/mujadid/Documents/q8/"
